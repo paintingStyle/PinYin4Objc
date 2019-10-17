@@ -15,7 +15,7 @@
 #define PYLog(__unused ...)
 #endif
 
-#define kCacheKeyForUnicode2Pinyin @"UnicodeToPinyin"
+#define kCacheKeyForUnicode2Pinyin @"_UnicodeToPinyin"
 static inline NSString* cachePathForKey(NSString* directory, NSString* key) {
 	return [directory stringByAppendingPathComponent:key];
 }
@@ -37,6 +37,7 @@ static inline NSString* cachePathForKey(NSString* directory, NSString* key) {
 }
 
 - (void)initializeResource {
+	
     NSString* cachesDirectory = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
 	_directory = [[[cachesDirectory stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"PinYinCache"] copy];
     NSFileManager *fileManager=[NSFileManager defaultManager];
@@ -50,14 +51,13 @@ static inline NSString* cachePathForKey(NSString* directory, NSString* key) {
     }
     
     NSDictionary *dataMap=(NSDictionary *)[self cachedObjectForKey:kCacheKeyForUnicode2Pinyin];
-    if (dataMap) {
+    if (dataMap.count) {
         self->_unicodeToHanyuPinyinTable=dataMap;
     }else{
-		
-		NSBundle *bundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"PinYin4Objc" ofType:@"bundle"]];
+		NSBundle *bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:NSClassFromString(@"PinYin4Objc")] URLForResource:@"PinYin4Objc" withExtension:@"bundle"]];
 		NSString *resourcePath = [bundle pathForResource:@"unicode_to_hanyu_pinyin" ofType:@"txt"];
-		//NSString *resourceName =[[NSBundle mainBundle] pathForResource:@"unicode_to_hanyu_pinyin" ofType:@"txt"];
-        NSString *dictionaryText=[NSString stringWithContentsOfFile:resourceName encoding:NSUTF8StringEncoding error:nil];
+        NSString *dictionaryText=[NSString stringWithContentsOfFile:resourcePath encoding:NSUTF8StringEncoding error:nil];
+		
         NSArray *lines = [dictionaryText componentsSeparatedByString:@"\r\n"];
         __block NSMutableDictionary *tempMap=[[NSMutableDictionary alloc] init];
         @autoreleasepool {
@@ -70,7 +70,6 @@ static inline NSString* cachePathForKey(NSString* directory, NSString* key) {
         [self cacheObjec:self->_unicodeToHanyuPinyinTable forKey:kCacheKeyForUnicode2Pinyin];
     }
 }
-
 - (id<NSCoding>)cachedObjectForKey:(NSString*)key
 {
     NSError *error=nil;
