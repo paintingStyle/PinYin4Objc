@@ -1,6 +1,9 @@
 PinYin4Objc
 ===========
 
+###
+fix unicode_to_hanyu_pinyin 资源文件加载不出来，2019.10.17
+
 PinYin4Objc is a popular objective-c library supporting convertion between Chinese(both Simplified and Tranditional) characters and most popular Pinyin systems， it's performance is very efficient, data cached at first time, you can use async method with block, this can avoid ui blocking, and runs smoothly. The output format of pinyin could be customized. 
 
 *update 
